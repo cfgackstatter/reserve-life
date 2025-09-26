@@ -33,6 +33,7 @@ python app.py
 4. **Analyze**: View reserve life trends in the interactive chart
 
 ## Project Structure
+```console
 reserve-life/
 ├── app.py # Main Dash application
 ├── utils.py # Utility functions for data fetching
@@ -40,6 +41,7 @@ reserve-life/
 │ └── style.css # Custom CSS styling
 ├── requirements.txt # Python dependencies
 └── README.md # This file
+```
 
 ## Data Sources
 
