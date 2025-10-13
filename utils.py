@@ -1,113 +1,67 @@
+"""
+General Utilities Module
+Contains company info fetching and data persistence functions.
+"""
+
+from typing import Dict, Any, Optional
 import yfinance as yf
-import pandas as pd
-import requests
 import json
 import os
-import re
-import random
-import time
-from datetime import datetime
 
-def get_yahoo_info(ticker):
-    """Fetch basic company info from Yahoo Finance."""
-    ticker_obj = yf.Ticker(ticker)
-    info = ticker_obj.info
-    if info and 'longName' in info:
-        return {
-            'ticker': ticker.upper(),
-            'name': info.get('longName', ''),
-            'country': info.get('country', '')
-        }
-    return None
 
-def get_cik_from_ticker(ticker):
-    """Lookup CIK for a given ticker from SEC's ticker.txt (tab-separated)."""
-    url_txt = "https://www.sec.gov/include/ticker.txt"
-    try:
-        headers = {"User-Agent": "your_email@example.com"}
-        resp = requests.get(url_txt, headers=headers, timeout=10)
-        if resp.status_code == 200:
-            lines = resp.text.splitlines()
-            ticker_lower = ticker.lower()
-            for line in lines:
-                try:
-                    tkr, cik = line.strip().split('\t')
-                    if tkr == ticker_lower:
-                        return str(cik).zfill(10)
-                except ValueError:
-                    continue
-    except Exception as e:
-        print(f"SEC request error: {e}")
-    return None
-
-def get_filings_in_date_range(cik, start_date, end_date, filing_types, user_agent="your_email@example.com"):
+def get_yahoo_info(ticker: str) -> Optional[Dict[str, str]]:
     """
-    Generic function to fetch filings of specified types between start_date and end_date from SEC EDGAR.
+    Fetch basic company info from Yahoo Finance.
     
     Args:
-        cik (str): Company CIK (zero-padded 10 digits)
-        start_date (str): Start date in 'YYYY-MM-DD' format
-        end_date (str): End date in 'YYYY-MM-DD' format  
-        filing_types (list): List of filing types like ['10-K', '10-Q', '8-K']
-        user_agent (str): User agent for requests
-    
+        ticker: Stock ticker symbol
+        
     Returns:
-        list: List of filing dicts sorted by date (descending)
+        Dict with company info or None if not found
     """
-    url = f"https://data.sec.gov/submissions/CIK{cik}.json"
-    headers = {"User-Agent": user_agent}
-    result = []
-    
     try:
-        resp = requests.get(url, headers=headers)
-        resp.raise_for_status()
-        data = resp.json()
-        filings = data.get("filings", {}).get("recent", {})
-        
-        for form, acc_no, fdate, primary_doc in zip(
-            filings.get("form", []),
-            filings.get("accessionNumber", []),
-            filings.get("filingDate", []),
-            filings.get("primaryDocument", [])
-        ):
-            # Check if filing type matches and date is in range
-            if (form.upper() in [ft.upper() for ft in filing_types] and 
-                start_date <= fdate <= end_date):
-                
-                acc_no_nodash = acc_no.replace("-", "")
-                html_url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{acc_no_nodash}/{primary_doc}"
-                
-                result.append({
-                    "type": form,
-                    "date": fdate,
-                    "accession": acc_no,
-                    "html_url": html_url,
-                    "primary_document": primary_doc
-                })
-        
-        # Sort by date descending
-        result.sort(key=lambda x: x["date"], reverse=True)
-        
+        ticker_obj = yf.Ticker(ticker)
+        info = ticker_obj.info
+        if info and 'longName' in info:
+            return {
+                'ticker': ticker.upper(),
+                'name': info.get('longName', ''),
+                'country': info.get('country', '')
+            }
     except Exception as e:
-        print(f"Error fetching filings for CIK {cik}: {e}")
-    
-    return result
+        print(f"Error fetching Yahoo info for {ticker}: {e}")
+    return None
 
-def extract_oil_data_from_10k(filing_url):
+
+def load_company_data(data_file: str) -> Dict[str, Any]:
     """
-    Dummy function that returns random oil data for testing.
-    TODO: Replace with actual extraction logic later.
+    Load company data from JSON file.
+    
+    Args:
+        data_file: Path to JSON data file
+        
+    Returns:
+        Dict containing company data
     """
-    # Simulate processing time
-    time.sleep(1)
+    if os.path.exists(data_file):
+        try:
+            with open(data_file, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading data file {data_file}: {e}")
+    return {}
+
+
+def save_company_data(data: Dict[str, Any], data_file: str) -> None:
+    """
+    Save company data to JSON file.
     
-    # Generate random but realistic values
-    proved_reserves = random.uniform(5e9, 50e9)  # 5B to 50B barrels
-    annual_production = random.uniform(50e6, 500e6)  # 50M to 500M barrels/year
-    
-    print(f"Extracted dummy data: Reserves: {proved_reserves:,.0f} barrels, Production: {annual_production:,.0f} barrels/year")
-    
-    return {
-        'proved_reserves': proved_reserves,
-        'annual_production': annual_production
-    }
+    Args:
+        data: Company data dictionary
+        data_file: Path to JSON data file
+    """
+    try:
+        with open(data_file, "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print(f"Error saving data file {data_file}: {e}")
