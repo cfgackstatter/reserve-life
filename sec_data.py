@@ -86,11 +86,13 @@ def get_filing_details_from_index(cik: str, accession: str, ticker: str) -> Opti
             return None
         soup = BeautifulSoup(resp.text, 'html.parser')
         period_end = None
-        period_head = soup.find("div", class_="infoHead", string=re.compile("Period of Report", re.IGNORECASE))
-        if period_head:
-            sib = period_head.find_next_sibling("div", class_="info")
-            if sib:
-                period_end = sib.get_text(strip=True)
+        info_heads: list[Tag] = soup.find_all("div", class_="infoHead")
+        for div in info_heads:
+            if div.string and re.search(r"Period of Report", div.string, re.IGNORECASE):
+                sib = div.find_next_sibling("div", class_="info")
+                if sib:
+                    period_end = sib.get_text(strip=True)
+                break
         document_name = None
         document_url = None
         tables = soup.find_all('table')
