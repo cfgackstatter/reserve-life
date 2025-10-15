@@ -32,7 +32,7 @@ DEFAULT_YEARS_BACK = 5
 app = dash.Dash(__name__,
                external_stylesheets=[dbc.themes.BOOTSTRAP],
                suppress_callback_exceptions=True)
-server = app.server
+application = app.server
 
 # Performance optimization - cache CIK lookups
 @lru_cache(maxsize=100)
@@ -707,4 +707,4 @@ def close_log_modal(n_clicks):
     return no_update
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    application.run(debug=True)
