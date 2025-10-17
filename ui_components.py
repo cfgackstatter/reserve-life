@@ -134,8 +134,10 @@ def render_filing_tab_content(ticker: str, filings: Dict[str, FilingData]) -> ht
         # Check if we have valid oil data (not NaN/None/0)
         reserves = extracted_data.get('proved_reserves', 0) if extracted_data else 0
         production = extracted_data.get('annual_production', 0) if extracted_data else 0
-        has_reserves = not is_nan_or_none(reserves) and reserves > 0
-        has_production = not is_nan_or_none(production) and production > 0
+
+        # Add explicit None checks before comparison
+        has_reserves = reserves is not None and not is_nan_or_none(reserves) and reserves > 0
+        has_production = production is not None and not is_nan_or_none(production) and production > 0
         has_oil_data = has_reserves or has_production
 
         # Extract button
@@ -298,11 +300,11 @@ def get_dropdown_options(companies: Dict[str, CompanyData]) -> List[Dict[str, st
                     reserves = extracted_data.get('proved_reserves', 0)
                     production = extracted_data.get('annual_production', 0)
                     
-                    # Check if we have valid data (not NaN/None/0)
-                    if not is_nan_or_none(reserves) and reserves > 0:
+                    # Check if we have valid data (not NaN/None/0) - explicit None check
+                    if reserves is not None and not is_nan_or_none(reserves) and reserves > 0:
                         has_oil_data = True
                         break
-                    if not is_nan_or_none(production) and production > 0:
+                    if production is not None and not is_nan_or_none(production) and production > 0:
                         has_oil_data = True
                         break
 
