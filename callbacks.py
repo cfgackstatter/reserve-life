@@ -55,7 +55,7 @@ def register_callbacks(app):
         Input('remove-btn', 'n_clicks')],
         [State('ticker-input', 'value'),
         State('company-store', 'data'),
-        State({'type': 'company-checkbox', 'index': dash.ALL}, 'value')],
+        State({'type': 'company-checkbox', 'index': ALL}, 'value')],
         prevent_initial_call=True
     )
     def manage_companies(
@@ -309,7 +309,7 @@ def register_callbacks(app):
     @app.callback(
         [Output('company-store', 'data', allow_duplicate=True),
         Output('extraction-message', 'children', allow_duplicate=True)],
-        [Input({'type': 'extract-single-btn', 'ticker': dash.ALL, 'date': dash.ALL}, 'n_clicks')],
+        [Input({'type': 'extract-single-btn', 'ticker': ALL, 'date': ALL}, 'n_clicks')],
         [State('company-store', 'data')],
         prevent_initial_call=True
     )
@@ -507,7 +507,7 @@ def register_callbacks(app):
     @app.callback(
         [Output('log-modal', 'is_open'),
         Output('log-modal-content', 'children')],
-        [Input({'type': 'log-btn', 'ticker': dash.ALL, 'date': dash.ALL}, 'n_clicks')],
+        [Input({'type': 'log-btn', 'ticker': ALL, 'date': ALL}, 'n_clicks')],
         [State('company-store', 'data'),
         State('log-modal', 'is_open')],
         prevent_initial_call=True
