@@ -10,9 +10,7 @@ from bs4 import BeautifulSoup, Tag
 from datetime import datetime
 import re
 
-SEC_USER_AGENT = "your_email@example.com"
-SEC_TIMEOUT = 15
-
+from config import SEC_USER_AGENT, SEC_TIMEOUT
 
 def get_cik_from_ticker(ticker: str) -> Optional[str]:
     """Lookup CIK for a ticker symbol from SEC's ticker.txt file."""
