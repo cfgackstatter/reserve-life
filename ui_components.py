@@ -1,11 +1,18 @@
 """
 UI Components Module - Modern, consistent styling
+
 Contains all Dash UI rendering functions with improved design.
 """
 
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Optional
 import math
+from datetime import datetime, timedelta
 from dash import html, dcc
+import dash_bootstrap_components as dbc
+
+from config import DEFAULT_YEARS_BACK, DATA_FILE
+from utils import load_company_data
+from models import CompanyData, FilingData
 
 # Consistent button styling
 BUTTON_BASE = {
@@ -45,7 +52,7 @@ BUTTON_STYLES = {
     }
 }
 
-def is_nan_or_none(value) -> bool:
+def is_nan_or_none(value: Any) -> bool:
     """Check if value is NaN or None."""
     if value is None:
         return True
@@ -54,7 +61,7 @@ def is_nan_or_none(value) -> bool:
     except (ValueError, TypeError):
         return True
 
-def render_company_table(companies: Dict[str, Any]) -> Union[html.Div, html.Table]:
+def render_company_table(companies: Dict[str, CompanyData]) -> html.Div | html.Table:
     """Render company management table with modern styling."""
     if not companies:
         return html.Div(
@@ -84,8 +91,8 @@ def render_company_table(companies: Dict[str, Any]) -> Union[html.Div, html.Tabl
                     style={'textAlign': 'center', 'padding': '8px'}
                 ),
                 html.Td(
-                    html.Code(entry["info"]["ticker"], 
-                             style={'backgroundColor': '#e9ecef', 'padding': '2px 6px', 'borderRadius': '3px'}),
+                    html.Code(entry["info"]["ticker"],
+                              style={'backgroundColor': '#e9ecef', 'padding': '2px 6px', 'borderRadius': '3px'}),
                     style={'textAlign': 'center', 'padding': '8px'}
                 ),
                 html.Td(entry["info"]["name"], style={'textAlign': 'left', 'padding': '8px'})
@@ -104,7 +111,7 @@ def render_company_table(companies: Dict[str, Any]) -> Union[html.Div, html.Tabl
         }
     )
 
-def render_filing_tab_content(ticker: str, filings: Dict[str, Any]) -> html.Div:
+def render_filing_tab_content(ticker: str, filings: Dict[str, FilingData]) -> html.Div:
     """Render filings table with consistent button styling."""
     if not filings:
         return html.Div(
@@ -112,21 +119,21 @@ def render_filing_tab_content(ticker: str, filings: Dict[str, Any]) -> html.Div:
             style={'color': '#6c757d', 'fontStyle': 'italic', 'padding': '20px', 'textAlign': 'center'}
         )
 
-    # Sort filings by filing date (newest first)  
+    # Sort filings by filing date (newest first)
     sorted_filings = sorted(filings.items(), key=lambda x: x[1].get('filing_date', ''), reverse=True)
-    rows = []
 
-    for accession, filing in sorted_filings:  # Changed from date to accession
+    rows = []
+    for accession, filing in sorted_filings:
         filing_type = filing.get('type', 'Unknown')
         url = filing.get('url', '')
         period_end = filing.get('period_end', '')
-        filing_date = filing.get('filing_date', '')  # Get actual filing date
+        filing_date = filing.get('filing_date', '')
         extracted_data = filing.get('extracted_data', {})
         extraction_log = filing.get('extraction_log', '')
 
         # Check if we have valid oil data (not NaN/None/0)
-        reserves = extracted_data.get('proved_reserves', 0)
-        production = extracted_data.get('annual_production', 0)
+        reserves = extracted_data.get('proved_reserves', 0) if extracted_data else 0
+        production = extracted_data.get('annual_production', 0) if extracted_data else 0
         has_reserves = not is_nan_or_none(reserves) and reserves > 0
         has_production = not is_nan_or_none(production) and production > 0
         has_oil_data = has_reserves or has_production
@@ -134,7 +141,7 @@ def render_filing_tab_content(ticker: str, filings: Dict[str, Any]) -> html.Div:
         # Extract button
         extract_btn = html.Button(
             "Extract" if not has_oil_data else "Re-extract",
-            id={'type': 'extract-single-btn', 'ticker': ticker, 'date': accession},  # Use accession for id
+            id={'type': 'extract-single-btn', 'ticker': ticker, 'date': accession},
             n_clicks=0,
             style=BUTTON_STYLES['extract'] if not has_oil_data else BUTTON_STYLES['extract_done']
         )
@@ -144,7 +151,7 @@ def render_filing_tab_content(ticker: str, filings: Dict[str, Any]) -> html.Div:
         if extraction_log or 'extracted_data' in filing:
             log_btn = html.Button(
                 "📋 Log",
-                id={'type': 'log-btn', 'ticker': ticker, 'date': accession},  # Use accession for id
+                id={'type': 'log-btn', 'ticker': ticker, 'date': accession},
                 n_clicks=0,
                 style=BUTTON_STYLES['log'],
                 title="View extraction log"
@@ -167,7 +174,7 @@ def render_filing_tab_content(ticker: str, filings: Dict[str, Any]) -> html.Div:
             data_status = html.Span("✗", style={'color': '#dc3545', 'fontSize': '16px'})
 
         rows.append(html.Tr([
-            html.Td(filing_date, style={'fontSize': '12px', 'padding': '6px', 'fontFamily': 'monospace', 'textAlign': 'left'}),  # Show filing_date
+            html.Td(filing_date, style={'fontSize': '12px', 'padding': '6px', 'fontFamily': 'monospace', 'textAlign': 'left'}),
             html.Td(period_end, style={'fontSize': '12px', 'padding': '6px', 'fontFamily': 'monospace', 'textAlign': 'left'}),
             html.Td(
                 html.Span(filing_type,
@@ -217,7 +224,7 @@ def render_filing_tab_content(ticker: str, filings: Dict[str, Any]) -> html.Div:
         }
     )
 
-def render_filings_tabs(companies: Dict[str, Any]) -> Union[html.Div, dcc.Tabs]:
+def render_filings_tabs(companies: Dict[str, CompanyData]) -> html.Div | dcc.Tabs:
     """Create tabs with fixed width and modern styling."""
     if not companies:
         return html.Div(
@@ -227,7 +234,7 @@ def render_filings_tabs(companies: Dict[str, Any]) -> Union[html.Div, dcc.Tabs]:
 
     # Filter companies that have filings
     companies_with_filings = {k: v for k, v in companies.items() if v.get('filings')}
-    
+
     if not companies_with_filings:
         return html.Div(
             "No filings found. Use 'Update Filings' button to fetch filings.",
@@ -248,8 +255,8 @@ def render_filings_tabs(companies: Dict[str, Any]) -> Union[html.Div, dcc.Tabs]:
                 'border': '1px solid #dee2e6',
                 'borderBottom': 'none',
                 'backgroundColor': 'white',
-                'minWidth': '120px',  # Fixed minimum width
-                'maxWidth': '200px',  # Fixed maximum width
+                'minWidth': '120px',
+                'maxWidth': '200px',
                 'textAlign': 'center'
             },
             selected_style={
@@ -260,7 +267,7 @@ def render_filings_tabs(companies: Dict[str, Any]) -> Union[html.Div, dcc.Tabs]:
                 'fontWeight': '600',
                 'border': '1px solid #007bff',
                 'borderBottom': 'none',
-                'minWidth': '120px',  # Same fixed width
+                'minWidth': '120px',
                 'maxWidth': '200px',
                 'textAlign': 'center'
             }
@@ -278,7 +285,7 @@ def render_filings_tabs(companies: Dict[str, Any]) -> Union[html.Div, dcc.Tabs]:
         }
     )
 
-def get_dropdown_options(companies: Dict[str, Any]) -> List[Dict[str, str]]:
+def get_dropdown_options(companies: Dict[str, CompanyData]) -> List[Dict[str, str]]:
     """Generate dropdown options for companies with oil data."""
     options = []
     for ticker, entry in companies.items():
@@ -287,56 +294,55 @@ def get_dropdown_options(companies: Dict[str, Any]) -> List[Dict[str, str]]:
             has_oil_data = False
             for filing in entry['filings'].values():
                 extracted_data = filing.get('extracted_data', {})
-                reserves = extracted_data.get('proved_reserves', 0)
-                production = extracted_data.get('annual_production', 0)
-                
-                # Check if we have valid data (not NaN/None/0)
-                if not is_nan_or_none(reserves) and reserves > 0:
-                    has_oil_data = True
-                    break
-                if not is_nan_or_none(production) and production > 0:
-                    has_oil_data = True
-                    break
-            
+                if extracted_data:
+                    reserves = extracted_data.get('proved_reserves', 0)
+                    production = extracted_data.get('annual_production', 0)
+                    
+                    # Check if we have valid data (not NaN/None/0)
+                    if not is_nan_or_none(reserves) and reserves > 0:
+                        has_oil_data = True
+                        break
+                    if not is_nan_or_none(production) and production > 0:
+                        has_oil_data = True
+                        break
+
             if has_oil_data:
                 company_name = entry['info']['name']
                 # Truncate long company names for dropdown
                 if len(company_name) > 40:
                     company_name = company_name[:37] + "..."
-                    
                 options.append({
                     "label": f"{ticker} - {company_name}",
                     "value": ticker
                 })
-    
     return options
 
 def create_app_layout() -> html.Div:
     """Create the main application layout."""
     default_start_date = (datetime.now() - timedelta(days=DEFAULT_YEARS_BACK*365)).strftime('%Y-%m-%d')
     default_end_date = datetime.now().strftime('%Y-%m-%d')
-    
+
     return html.Div([
         html.H1("Oil Companies Reserve Life Tracker", style={'marginBottom': '20px'}),
-        
+
         # Enhanced data store with session storage
         dcc.Store(id='company-store', data=load_company_data(DATA_FILE), storage_type='session'),
-        
+
         # Section 1: Manage Companies
         html.Div([
             html.H3("Manage Companies", style={'marginBottom': '10px'}),
             html.Div([
-                dcc.Input(id='ticker-input', type='text', placeholder='Enter ticker (e.g. XOM)',
+                dcc.Input(id='company-ticker-input', type='text', placeholder='Enter ticker (e.g. XOM)',
                          debounce=True, style={'marginRight': '8px'}),
-                html.Button('Add Company', id='add-btn', n_clicks=0,
+                html.Button('Add Company', id='add-company-btn', n_clicks=0,
                            style={'marginRight': '8px'}),
-                html.Button('Remove Selected', id='remove-btn', n_clicks=0,
+                html.Button('Remove Selected', id='remove-company-btn', n_clicks=0,
                            style={'backgroundColor': '#dc3545', 'color': 'white', 'border': 'none'}),
             ], style={'marginBottom': '10px'}),
             html.Div(id='company-table-div'),
-            html.Div(id='company-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
+            html.Div(id='add-company-feedback', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
         ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
-        
+
         # Section 2: Update Filings with loading indicator
         html.Div([
             html.H3("Update Filings", style={'marginBottom': '10px'}),
@@ -359,7 +365,7 @@ def create_app_layout() -> html.Div:
                             {'label': '10-K', 'value': '10-K'},
                             {'label': '10-Q', 'value': '10-Q'}
                         ],
-                        value=['10-K'], # Default to only 10-K
+                        value=['10-K'],
                         inline=True,
                         style={'fontSize': '13px'}
                     ),
@@ -367,8 +373,7 @@ def create_app_layout() -> html.Div:
             ], style={'marginBottom': '10px'}),
             html.Button('Update Filings for All Companies', id='update-filings-btn', n_clicks=0,
                        style={'backgroundColor': '#28a745', 'color': 'white', 'border': 'none',
-                              'padding': '8px 16px', 'marginBottom': '10px'}),
-            # Loading indicator for filings
+                             'padding': '8px 16px', 'marginBottom': '10px'}),
             dcc.Loading(
                 id="loading-filings",
                 children=html.Div(id='filings-table-div'),
@@ -376,17 +381,17 @@ def create_app_layout() -> html.Div:
             ),
             html.Div(id='filing-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
         ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
-        
+
         # Section 3: Extract Oil Data
         html.Div([
             html.H3("Extract Oil Data", style={'marginBottom': '10px'}),
             html.P("Extract oil reserves and production data from filings. Individual extract buttons are available in the filings tabs above.",
-                   style={'fontSize': '13px', 'color': '#666', 'marginBottom': '10px'}),
+                  style={'fontSize': '13px', 'color': '#666', 'marginBottom': '10px'}),
             html.Button('Extract Oil Data for All New Filings', id='extract-oil-btn', n_clicks=0,
                        style={'backgroundColor': '#ffc107', 'color': 'black', 'border': 'none', 'padding': '8px 16px'}),
             html.Div(id='extraction-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
         ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
-        
+
         # Section 4: Reserve Life Analysis
         html.Div([
             html.H3("Reserve Life Analysis", style={'marginBottom': '10px'}),
@@ -394,7 +399,7 @@ def create_app_layout() -> html.Div:
                         style={'marginBottom': '10px'}),
             dcc.Graph(id='edgar-chart'),
         ], style={'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
-        
+
         # Modal for extraction logs
         dbc.Modal([
             dbc.ModalBody(id="log-modal-content")
