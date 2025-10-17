@@ -310,3 +310,93 @@ def get_dropdown_options(companies: Dict[str, Any]) -> List[Dict[str, str]]:
                 })
     
     return options
+
+def create_app_layout() -> html.Div:
+    """Create the main application layout."""
+    default_start_date = (datetime.now() - timedelta(days=DEFAULT_YEARS_BACK*365)).strftime('%Y-%m-%d')
+    default_end_date = datetime.now().strftime('%Y-%m-%d')
+    
+    return html.Div([
+        html.H1("Oil Companies Reserve Life Tracker", style={'marginBottom': '20px'}),
+        
+        # Enhanced data store with session storage
+        dcc.Store(id='company-store', data=load_company_data(DATA_FILE), storage_type='session'),
+        
+        # Section 1: Manage Companies
+        html.Div([
+            html.H3("Manage Companies", style={'marginBottom': '10px'}),
+            html.Div([
+                dcc.Input(id='ticker-input', type='text', placeholder='Enter ticker (e.g. XOM)',
+                         debounce=True, style={'marginRight': '8px'}),
+                html.Button('Add Company', id='add-btn', n_clicks=0,
+                           style={'marginRight': '8px'}),
+                html.Button('Remove Selected', id='remove-btn', n_clicks=0,
+                           style={'backgroundColor': '#dc3545', 'color': 'white', 'border': 'none'}),
+            ], style={'marginBottom': '10px'}),
+            html.Div(id='company-table-div'),
+            html.Div(id='company-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
+        ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
+        
+        # Section 2: Update Filings with loading indicator
+        html.Div([
+            html.H3("Update Filings", style={'marginBottom': '10px'}),
+            html.Div([
+                html.Div([
+                    html.Label("Date Range:", style={'fontSize': '13px', 'marginRight': '10px'}),
+                    dcc.DatePickerRange(
+                        id='filing-date-range',
+                        start_date=default_start_date,
+                        end_date=default_end_date,
+                        display_format='YYYY-MM-DD',
+                        style={'fontSize': '12px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '20px'}),
+                html.Div([
+                    html.Label("Types:", style={'fontSize': '13px', 'marginRight': '10px'}),
+                    dcc.Checklist(
+                        id='filing-types-checklist',
+                        options=[
+                            {'label': '10-K', 'value': '10-K'},
+                            {'label': '10-Q', 'value': '10-Q'}
+                        ],
+                        value=['10-K'], # Default to only 10-K
+                        inline=True,
+                        style={'fontSize': '13px'}
+                    ),
+                ], style={'display': 'inline-block'}),
+            ], style={'marginBottom': '10px'}),
+            html.Button('Update Filings for All Companies', id='update-filings-btn', n_clicks=0,
+                       style={'backgroundColor': '#28a745', 'color': 'white', 'border': 'none',
+                              'padding': '8px 16px', 'marginBottom': '10px'}),
+            # Loading indicator for filings
+            dcc.Loading(
+                id="loading-filings",
+                children=html.Div(id='filings-table-div'),
+                type="default"
+            ),
+            html.Div(id='filing-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
+        ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
+        
+        # Section 3: Extract Oil Data
+        html.Div([
+            html.H3("Extract Oil Data", style={'marginBottom': '10px'}),
+            html.P("Extract oil reserves and production data from filings. Individual extract buttons are available in the filings tabs above.",
+                   style={'fontSize': '13px', 'color': '#666', 'marginBottom': '10px'}),
+            html.Button('Extract Oil Data for All New Filings', id='extract-oil-btn', n_clicks=0,
+                       style={'backgroundColor': '#ffc107', 'color': 'black', 'border': 'none', 'padding': '8px 16px'}),
+            html.Div(id='extraction-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
+        ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
+        
+        # Section 4: Reserve Life Analysis
+        html.Div([
+            html.H3("Reserve Life Analysis", style={'marginBottom': '10px'}),
+            dcc.Dropdown(id='select-companies', multi=True, placeholder="Select companies to visualize",
+                        style={'marginBottom': '10px'}),
+            dcc.Graph(id='edgar-chart'),
+        ], style={'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
+        
+        # Modal for extraction logs
+        dbc.Modal([
+            dbc.ModalBody(id="log-modal-content")
+        ], id="log-modal", is_open=False, size="xl")
+    ])
