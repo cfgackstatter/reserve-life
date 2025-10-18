@@ -49,11 +49,11 @@ def register_callbacks(app):
         
     @app.callback(
         [Output('company-store', 'data'),
-        Output('ticker-input', 'value'),
-        Output('company-message', 'children')],
-        [Input('add-btn', 'n_clicks'),
-        Input('remove-btn', 'n_clicks')],
-        [State('ticker-input', 'value'),
+        Output('company-ticker-input', 'value'),
+        Output('add-company-feedback', 'children')],
+        [Input('add-company-btn', 'n_clicks'),
+        Input('remove-company-btn', 'n_clicks')],
+        [State('company-ticker-input', 'value'),
         State('company-store', 'data'),
         State({'type': 'company-checkbox', 'index': ALL}, 'value')],
         prevent_initial_call=True
@@ -76,12 +76,11 @@ def register_callbacks(app):
             message = ""
             ticker_val = ticker if ticker else ""
             
-            if "add-btn" in triggered and ticker:
+            if "add-company-btn" in triggered and ticker:
                 ticker = ticker.upper().strip()
                 if ticker not in companies:
                     info = get_yahoo_info(ticker)
                     cik = get_cached_cik(ticker)
-                    
                     if info and cik:
                         info["cik"] = cik
                         companies[ticker] = {"info": info, "filings": {}}
@@ -92,8 +91,8 @@ def register_callbacks(app):
                 else:
                     message = f"⚠ {ticker} already exists"
                 ticker_val = ""
-                
-            elif "remove-btn" in triggered:
+            
+            elif "remove-company-btn" in triggered:
                 selected_tickers = []
                 for values in checkbox_values:
                     if values:
@@ -110,7 +109,7 @@ def register_callbacks(app):
                     message = "⚠ No companies selected for removal"
             
             return companies, ticker_val, message
-            
+        
         except Exception as e:
             print(f"Error in manage_companies: {e}")
             return no_update, no_update, f"❌ Error: {str(e)}"
