@@ -1,80 +1,343 @@
+/* ============================================
+   Reserve Life Tracker - Professional Styles
+   ============================================ */
+
+/* Base Styles */
 body {
     background: #f7f9fa;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2c3e50;
+    line-height: 1.6;
 }
-h2 {
+
+/* Container Responsive Width */
+#react-entry-point > div {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Headings */
+h1 {
+    color: #1a365d;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+h2, h3 {
     color: #293855;
-    margin-bottom: 8px;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
+
+h3 {
+    font-size: 1.25rem;
+}
+
 hr {
     border: none;
-    border-top: 3px solid #e0e5eb;
-}
-.dash-table {
-    margin-top: 10px;
+    border-top: 2px solid #e0e5eb;
+    margin: 1.5rem 0;
 }
 
-/* Modern Table Style */
-.custom-table {
-    border-collapse: collapse;
-    width: 100%;
-    background: #fff;
-    box-shadow: 0 2px 12px 0 rgba(0,0,0,.07);
-    border-radius: 6px;
-    overflow: hidden;
-}
-.custom-table th, .custom-table td {
-    border-right: 1px solid #e1e4ea;
-    padding: 10px 14px;
-    text-align: left;
-}
-.custom-table th:last-child, .custom-table td:last-child {
-    border-right: none;
-}
-.custom-table th {
-    background: #f3f5fa;
-    color: #222b45;
-    font-weight: 600;
-    border-bottom: 4px solid #4C72B0;
-}
-.custom-table tr {
-    border-bottom: 1px solid #e8eaef;
-}
-.custom-table tr:last-child td {
-    border-bottom: none;
-}
-.custom-table td button {
-    background: #4C72B0;
-    color: #fff;
-    border: none;
-    padding: 5px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.95em;
-    transition: background .15s;
-}
-.custom-table td button:hover {
-    background: #314280;
-}
+/* ============================================
+   Input & Form Elements
+   ============================================ */
 
-input, textarea, .dash-dropdown {
+input[type="text"],
+textarea,
+.dash-dropdown .Select-control {
     border: 1px solid #d1d5db !important;
     border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 1em;
-    background: #f8fafc;
-    margin-right: 8px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
+
+input[type="text"]:focus,
+textarea:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+/* Date Picker */
+.DateInput_input {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+}
+
+/* ============================================
+   Tables - Professional Styling
+   ============================================ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table thead {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+table th {
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 12px 16px;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.9rem;
+}
+
+table tr:last-child td {
+    border-bottom: none;
+}
+
+table tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Dash DataTable Override */
+.dash-table-container {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+}
+
+/* ============================================
+   Buttons - Consistent Modern Style
+   ============================================ */
+
+button {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Sections - Card-like Containers
+   ============================================ */
+
+.dash-div > div[style*="border"] {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s;
+}
+
+.dash-div > div[style*="border"]:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Graphs & Charts
+   ============================================ */
 
 .dash-graph {
     background: #fff;
-    border-radius: 6px;
-    padding: 6px;
-    box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-#json-view {
-    font-family: 'Fira Mono', 'Menlo', Courier, monospace;
-    font-size: 0.98em;
+/* ============================================
+   Tabs Styling
+   ============================================ */
+
+.tab {
+    border-radius: 6px 6px 0 0 !important;
+    transition: background-color 0.2s;
+}
+
+.tab:hover {
+    background-color: #f1f3f5 !important;
+}
+
+/* ============================================
+   Loading Spinners
+   ============================================ */
+
+._dash-loading {
+    opacity: 0.7;
+}
+
+._dash-loading-callback {
+    pointer-events: none;
+}
+
+/* ============================================
+   Modal Improvements
+   ============================================ */
+
+.modal-content {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 2px solid #e9ecef;
+    padding: 1.25rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* ============================================
+   Code/Log Display
+   ============================================ */
+
+#json-view,
+pre,
+code {
+    font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+    font-size: 0.875rem;
+    background: #f8f9fa;
     border-radius: 6px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+/* ============================================
+   Responsive Design - Mobile First
+   ============================================ */
+
+/* Tablets and smaller desktops */
+@media (max-width: 992px) {
+    #react-entry-point > div {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    table th, table td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    button {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+    #react-entry-point > div {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+    }
+    
+    table {
+        font-size: 0.8rem;
+    }
+    
+    table th, table td {
+        padding: 8px 10px;
+    }
+    
+    button {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Stack buttons vertically on mobile */
+    .dash-div button {
+        display: block;
+        margin-right: 0 !important;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    #react-entry-point > div {
+        padding: 8px;
+    }
+    
+    h1 {
+        font-size: 1.25rem;
+    }
+    
+    table th, table td {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+    body {
+        background: white;
+    }
+    
+    button {
+        display: none;
+    }
+    
+    .dash-graph {
+        box-shadow: none;
+    }
 }
