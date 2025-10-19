@@ -374,12 +374,13 @@ def create_app_layout() -> html.Div:
                 ], style={'display': 'inline-block'}),
             ], style={'marginBottom': '10px'}),
             html.Button('Update Filings for All Companies', id='update-filings-btn', n_clicks=0,
-                       style={'backgroundColor': '#28a745', 'color': 'white', 'border': 'none',
-                             'padding': '8px 16px', 'marginBottom': '10px'}),
+                        style={'backgroundColor': '#28a745', 'color': 'white', 'border': 'none',
+                                'padding': '8px 16px', 'marginBottom': '10px'}),
             dcc.Loading(
                 id="loading-filings",
-                children=html.Div(id='filings-table-div'),
-                type="default"
+                type="default",
+                color="#007bff",
+                children=html.Div(id='filings-table-div')
             ),
             html.Div(id='filing-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
         ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
@@ -390,8 +391,15 @@ def create_app_layout() -> html.Div:
             html.P("Extract oil reserves and production data from filings. Individual extract buttons are available in the filings tabs above.",
                   style={'fontSize': '13px', 'color': '#666', 'marginBottom': '10px'}),
             html.Button('Extract Oil Data for All New Filings', id='extract-oil-btn', n_clicks=0,
-                       style={'backgroundColor': '#ffc107', 'color': 'black', 'border': 'none', 'padding': '8px 16px'}),
-            html.Div(id='extraction-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'}),
+                    style={'backgroundColor': '#ffc107', 'color': 'black', 'border': 'none', 'padding': '8px 16px'}),
+            dcc.Loading(
+                id="loading-extraction",
+                type="circle",
+                color="#ffc107",
+                delay_show=300,
+                delay_hide=100,
+                children=html.Div(id='extraction-message', style={'color': 'blue', 'fontSize': '13px', 'margin': '5px 0'})
+            ),
         ], style={'marginBottom': '20px', 'padding': '15px', 'border': '1px solid #ddd', 'borderRadius': '5px'}),
 
         # Section 4: Reserve Life Analysis
