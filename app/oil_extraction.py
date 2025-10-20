@@ -13,7 +13,7 @@ import requests
 from contextlib import redirect_stdout, redirect_stderr
 from bs4 import BeautifulSoup, Tag
 
-from llm_client import query_llm, extract_json_from_response, is_llm_available
+from app.llm_client import query_llm, extract_json_from_response, is_llm_available
 
 SEC_USER_AGENT = "your_email@example.com"
 

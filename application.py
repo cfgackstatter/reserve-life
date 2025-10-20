@@ -2,8 +2,8 @@
 import dash
 import dash_bootstrap_components as dbc
 
-from ui_components import create_app_layout
-from callbacks import register_callbacks
+from app.ui_components import create_app_layout
+from app.callbacks import register_callbacks
 
 # Initialize Dash app
 app = dash.Dash(

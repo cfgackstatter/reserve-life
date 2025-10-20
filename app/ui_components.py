@@ -10,9 +10,9 @@ from datetime import datetime, timedelta
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 
-from config import DEFAULT_YEARS_BACK, DATA_FILE
-from utils import load_company_data
-from models import CompanyData, FilingData
+from app.config import DEFAULT_YEARS_BACK, DATA_FILE
+from app.utils import load_company_data
+from app.models import CompanyData, FilingData
 
 # Consistent button styling
 BUTTON_BASE = {

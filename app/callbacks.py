@@ -10,11 +10,11 @@ import pandas as pd
 import plotly.graph_objs as go
 from dash import ALL, Input, Output, State, callback_context, html, no_update
 
-from config import DATA_FILE, DEFAULT_YEARS_BACK, MAX_DATE_RANGE_YEARS
-from oil_extraction import extract_oil_data_from_filing
-from sec_data import get_cik_from_ticker, get_filings_in_date_range
-from ui_components import get_dropdown_options, render_company_table, render_filings_tabs
-from utils import get_yahoo_info, save_company_data
+from app.config import DATA_FILE, DEFAULT_YEARS_BACK, MAX_DATE_RANGE_YEARS
+from app.oil_extraction import extract_oil_data_from_filing
+from app.sec_data import get_cik_from_ticker, get_filings_in_date_range
+from app.ui_components import get_dropdown_options, render_company_table, render_filings_tabs
+from app.utils import get_yahoo_info, save_company_data
 
 @lru_cache(maxsize=128)
 def get_cached_cik(ticker: str) -> Optional[str]:
