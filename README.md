@@ -59,7 +59,7 @@ Get your API key from [Perplexity AI](https://www.perplexity.ai/)
 
 4. **Run the application**
 ```console
-python app.py
+python application.py
 ```
 
 5. **Open in browser**
@@ -96,17 +96,29 @@ Navigate to `http://localhost:8050`
 
 ## Project Structure
 ```console
-oil-reserve-tracker/
-├── app.py # Main Dash application
-├── sec_data.py # SEC EDGAR data fetching
-├── oil_extraction.py # AI-powered data extraction
-├── llm_client.py # Perplexity AI integration
-├── ui_components.py # UI rendering components
-├── utils.py # Utility functions
-├── company_data.json # Persistent data storage
+reserve-life/
+├── app/
+│ ├── init.py # Initializes the Dash app and server
+│ ├── config.py # Configuration constants and environment variables
+│ ├── callbacks.py # Dash callback functions
+│ ├── ui_components.py # Layout and reusable UI functions
+│ ├── utils.py # Utility and data handling functions
+│ ├── models.py # Data models and TypedDict definitions
+│ ├── llm_client.py # Perplexity AI integration
+│ ├── oil_extraction.py # Oil reserves data extraction logic
+│ └── sec_data.py # SEC EDGAR filing downloader and parser
+│
+├── assets/
+│ ├── style.css # Custom styling overrides Bootstrap
+│ └── favicon.ico # Oil barrel favicon displayed in tab
+│
+├── company_data.json # Persistent data storage on server
+├── application.py # Entry point that runs the Dash app
 ├── requirements.txt # Python dependencies
-├── .env # Environment variables (create this)
-└── README.md
+├── .env # Environment variables (excluded from Git)
+├── .gitignore # Git ignore rules
+├── .ebignore # AWS Elastic Beanstalk ignore rules
+└── README.md # Project documentation
 ```
 
 ## How It Works
@@ -129,7 +141,7 @@ Reserve Life (years) = Proved Reserves (barrels) / Annual Production (barrels/ye
 ## Configuration
 
 ### Date Range
-Modify `DEFAULT_YEARS_BACK` in `app.py`:
+Modify `DEFAULT_YEARS_BACK` in `app/config.py`:
 
 ```console
 DEFAULT_YEARS_BACK = 5 # Change to desired number of years
