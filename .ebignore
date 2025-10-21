@@ -30,7 +30,11 @@ wheels/
 company_data.json
 *.log
 
-# IDE
+# Jupyter and notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# IDEs
 .vscode/
 .idea/
 *.swp
@@ -41,7 +45,7 @@ company_data.json
 .git/
 .gitignore
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
